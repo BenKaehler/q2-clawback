@@ -7,6 +7,8 @@
 # ----------------------------------------------------------------------------
 
 from qiime2.plugin import Plugin
+from q2_types.feature_table import FeatureTable, RelativeFrequency
+
 
 import q2_clawback
 
@@ -18,43 +20,36 @@ plugin = Plugin(
     citation_text=("Something Awesome. Kaehler B, Bokulich, N. "
                    "J. Awesome. 2018"),
     description=('This QIIME 2 plugin provides support for generating '
-                 'generating class weights for use with the ',
+                 'generating class weights for use with the '
                  'feature-classifier'),
     short_description='CLAss Weight Assembler plugin.'
 )
 
-plugin.methods.register_function(
+plugin.visualizers.register_function(
     function=q2_clawback.fetch_QIITA_community_types,
     inputs={},
     parameters={},
-    outputs=[],
-    input_descriptions={},
-    parameter_descriptions={},
-    output_descriptions={},
     name='Fetch QIITA community types',
-    description=("Fetch community types from QIITA")
+    description='Fetch community types from QIITA'
 )
 
-plugin.methods.register_function(
-    function=q2_clawback.fetch_QIITA_samples_for_type,
-    inputs={},
-    parameters={},
-    outputs=[],
-    input_descriptions={},
-    parameter_descriptions={},
-    output_descriptions={},
-    name='Fetch QIITA sample labels',
-    description=("Fetch samples from QIITA for a given community type")
-)
+# plugin.methods.register_function(
+#     function=q2_clawback.fetch_QIITA_samples_for_type,
+#     inputs={},
+#     parameters={},
+#     outputs=[],
+#     input_descriptions={},
+#     parameter_descriptions={},
+#     output_descriptions={},
+#     name='Fetch QIITA sample labels',
+#     description=("Fetch samples from QIITA for a given community type")
+# )
 
 plugin.methods.register_function(
     function=q2_clawback.assemble_taxonomy_weights,
     inputs={},
     parameters={},
-    outputs=[],
-    input_descriptions={},
-    parameter_descriptions={},
-    output_descriptions={},
+    outputs=[('class_weight', FeatureTable[RelativeFrequency])],
     name='Assemble the taxonomy weights from a set of samples',
-    description=("Assemble the taxonomy weights for a set of QIITA samples")
+    description='Assemble the taxonomy weights for a set of QIITA samples'
 )
