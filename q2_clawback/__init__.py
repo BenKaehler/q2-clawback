@@ -7,12 +7,12 @@
 # ----------------------------------------------------------------------------
 
 from ._version import get_versions
-from ._clawback import (fetch_QIITA_community_types,
-                        fetch_QIITA_samples_for_type,
-                        assemble_taxonomy_weights)
+from ._clawback import (summarize_QIITA_sample_types_and_contexts,
+                        fetch_QIITA_features,
+                        summarize_QIITA_features)
 
-__all__ = ['fetch_QIITA_community_types', 'fetch_QIITA_samples_for_type',
-           'assemble_taxonomy_weights']
+__all__ = ['summarize_QIITA_sample_types_and_contexts',
+           'summarize_QIITA_features']
 
 __version__ = get_versions()['version']
 del get_versions

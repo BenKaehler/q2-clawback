@@ -6,9 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Plugin
+from qiime2.plugin import Plugin, List, Str, Float
 from q2_types.feature_table import FeatureTable, RelativeFrequency
-
+from q2_types.feature_data import FeatureData, Taxonomy
 
 import q2_clawback
 
@@ -26,29 +26,19 @@ plugin = Plugin(
 )
 
 plugin.visualizers.register_function(
-    function=q2_clawback.fetch_QIITA_community_types,
+    function=q2_clawback.summarize_QIITA_sample_types_and_contexts,
     inputs={},
     parameters={},
-    name='Fetch QIITA community types',
-    description='Fetch community types from QIITA'
+    name='Fetch QIITA sample types and contexts',
+    description='Display of counts of samples by sample type and context'
 )
 
-# plugin.methods.register_function(
-#     function=q2_clawback.fetch_QIITA_samples_for_type,
-#     inputs={},
-#     parameters={},
-#     outputs=[],
-#     input_descriptions={},
-#     parameter_descriptions={},
-#     output_descriptions={},
-#     name='Fetch QIITA sample labels',
-#     description=("Fetch samples from QIITA for a given community type")
-# )
-
 plugin.methods.register_function(
-    function=q2_clawback.assemble_taxonomy_weights,
-    inputs={},
-    parameters={},
+    function=q2_clawback.summarize_QIITA_features,
+    inputs={'reference_taxonomy': FeatureData[Taxonomy]},
+    parameters={'sample_type': List[Str],
+                'context': Str,
+                'background_weight': Float},
     outputs=[('class_weight', FeatureTable[RelativeFrequency])],
     name='Assemble the taxonomy weights from a set of samples',
     description='Assemble the taxonomy weights for a set of QIITA samples'
