@@ -6,9 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Plugin, List, Str, Float
-from q2_types.feature_table import FeatureTable, RelativeFrequency
-from q2_types.feature_data import FeatureData, Taxonomy
+from qiime2.plugin import Plugin, List, Str, Float, Bool
+from q2_types.feature_table import FeatureTable, RelativeFrequency, Frequency
+from q2_types.feature_data import FeatureData, Taxonomy, Sequence
 
 import q2_clawback
 
@@ -38,8 +38,30 @@ plugin.methods.register_function(
     inputs={'reference_taxonomy': FeatureData[Taxonomy]},
     parameters={'sample_type': List[Str],
                 'context': Str,
-                'background_weight': Float},
+                'unobserved_weight': Float},
     outputs=[('class_weight', FeatureTable[RelativeFrequency])],
     name='Assemble the taxonomy weights from a set of samples',
     description='Assemble the taxonomy weights for a set of QIITA samples'
+)
+
+plugin.methods.register_function(
+    function=q2_clawback.sequence_variants_from_feature_table,
+    inputs={'table': FeatureTable[Frequency]},
+    parameters=None,
+    outputs=[('sequences', FeatureData[Sequence])],
+    name='Extract sequence variants from a feature table',
+    description='Extract sequence variants from a feature table, '
+    'if the feature table observations are labelled by sequence variant'
+)
+
+plugin.methods.register_function(
+    function=q2_clawback.generate_class_weights,
+    inputs={'reference_taxonomy': FeatureData[Taxonomy],
+            'table': FeatureTable[Frequency],
+            'taxonomy_classification': FeatureData[Taxonomy]},
+    parameters={'unobserved_weight': Float, 'normalise': Bool},
+    outputs=[('class_weight', FeatureTable[RelativeFrequency])],
+    name='Generate class weights from a set of samples',
+    description='Generate class weights for use with a taxonomic classifier '
+    'from a set of existing observations'
 )

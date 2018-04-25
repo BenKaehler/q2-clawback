@@ -6,7 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import os
-from collections import Counter
 
 import pkg_resources
 import biom
@@ -14,10 +13,17 @@ import q2templates
 import redbiom.fetch
 import redbiom.summarize
 import redbiom.search
-from pandas import Series
+from pandas import Series, DataFrame
 from numpy import array
+from skbio import DNA
+from q2_types.feature_data import DNAIterator
 
 TEMPLATES = pkg_resources.resource_filename('q2_clawback', 'assets')
+
+
+def sequence_variants_from_feature_table(table: biom.Table) -> DNAIterator:
+    seqs = (DNA(s, metadata={'id': s}) for s in table.ids(axis='observation'))
+    return DNAIterator(seqs)
 
 
 def summarize_QIITA_sample_types_and_contexts(output_dir: str=None):
@@ -45,33 +51,45 @@ def fetch_QIITA_features(sample_type: list, context: str) -> biom.Table:
     return table
 
 
-def create_class_weights(
-        taxonomy: Series, table: biom.Table, background_weight: float):
-    ids = table.ids(axis='observation')
-    normed_table = table.norm(inplace=False)
-    nonzero_weights = normed_table.sum(axis='observation') / table.length()
-    nonzero_weights = dict(zip(ids, nonzero_weights))
+def generate_class_weights(reference_taxonomy: Series, table: biom.Table,
+                           taxonomy_classification: DataFrame=None,
+                           unobserved_weight: float=1e-6, normalise: bool=False
+                           ) -> biom.Table:
+    weights = {t: 0. for t in reference_taxonomy.values}
+    if normalise:
+        table.norm()
 
-    weights = Counter()
-    for seq_id, taxon in taxonomy.items():
-        if seq_id in nonzero_weights:
-            weights[taxon] += nonzero_weights[seq_id]
-        else:
-            weights[taxon] += 0
+    if taxonomy_classification is not None:
+        tax_map = taxonomy_classification['Taxon']
+        try:
+            taxa = [tax_map[s] for s in table.ids(axis='observation')]
+        except KeyError as s:
+            raise ValueError(str(s) + ' not in taxonomy_classification')
+        if not set(taxa).issubset(weights):
+            raise ValueError(
+                'taxonomy_classification does not match reference_taxonomy')
+    else:
+        try:
+            taxa = [reference_taxonomy[s]
+                    for s in table.ids(axis='observation')]
+        except KeyError as s:
+            raise ValueError(str(s) + ' not in reference_taxonomy')
 
+    for taxon, count in zip(taxa, table.sum('observation')):
+        weights[taxon] += count
     taxa, weights = zip(*weights.items())
     weights = array(weights)
-    weights *= 1. - background_weight
-    zero_weights = weights == 0
-    weights[zero_weights] = background_weight / sum(zero_weights)
+    weights /= weights.sum()
+    weights = (1. - unobserved_weight)*weights + unobserved_weight/len(weights)
+    weights /= weights.sum()
 
     return biom.Table(weights[None].T, taxa, sample_ids=['Weight'])
 
 
 def summarize_QIITA_features(
         reference_taxonomy: Series, sample_type: list, context: str,
-        background_weight: float=1e-6) -> biom.Table:
+        unobserved_weight: float=1e-6) -> biom.Table:
     table = fetch_QIITA_features(sample_type, context)
-    weights = create_class_weights(
-        reference_taxonomy, table, background_weight)
+    weights = generate_class_weights(
+        reference_taxonomy, table, unobserved_weight)
     return weights
