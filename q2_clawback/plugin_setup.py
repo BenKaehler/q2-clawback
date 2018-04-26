@@ -57,6 +57,7 @@ plugin.methods.register_function(
 plugin.methods.register_function(
     function=q2_clawback.generate_class_weights,
     inputs={'reference_taxonomy': FeatureData[Taxonomy],
+            'reference_sequences': FeatureData[Sequence],
             'table': FeatureTable[Frequency],
             'taxonomy_classification': FeatureData[Taxonomy]},
     parameters={'unobserved_weight': Float, 'normalise': Bool},

@@ -51,11 +51,12 @@ def fetch_QIITA_features(sample_type: list, context: str) -> biom.Table:
     return table
 
 
-def generate_class_weights(reference_taxonomy: Series, table: biom.Table,
-                           taxonomy_classification: DataFrame=None,
-                           unobserved_weight: float=1e-6, normalise: bool=False
-                           ) -> biom.Table:
-    weights = {t: 0. for t in reference_taxonomy.values}
+def generate_class_weights(
+        reference_taxonomy: Series, reference_sequences: DNAIterator,
+        table: biom.Table, taxonomy_classification: DataFrame=None,
+        unobserved_weight: float=1e-6, normalise: bool=False) -> biom.Table:
+    weights = {reference_taxonomy[seq.metadata['id']]: 0.
+               for seq in reference_sequences}
     if normalise:
         table.norm()
 
