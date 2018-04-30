@@ -8,16 +8,16 @@
 
 from ._version import get_versions
 from ._clawback import (summarize_QIITA_sample_types_and_contexts,
-                        fetch_QIITA_features,
-                        summarize_QIITA_features,
-                        sequence_variants_from_feature_table,
-                        generate_class_weights)
+                        fetch_QIITA_samples,
+                        sequence_variants_from_samples,
+                        generate_class_weights,
+                        assemble_weights_from_QIITA_sample_types)
 
 __all__ = ['summarize_QIITA_sample_types_and_contexts',
-           'summarize_QIITA_features',
-           'sequence_variants_from_feature_table',
-           'fetch_QIITA_features',
-           'generate_class_weights']
+           'sequence_variants_from_samples',
+           'fetch_QIITA_samples',
+           'generate_class_weights',
+           'assemble_weights_from_QIITA_sample_types']
 
 __version__ = get_versions()['version']
 del get_versions

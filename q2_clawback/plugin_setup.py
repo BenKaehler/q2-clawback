@@ -9,6 +9,7 @@
 from qiime2.plugin import Plugin, List, Str, Float, Bool
 from q2_types.feature_table import FeatureTable, RelativeFrequency, Frequency
 from q2_types.feature_data import FeatureData, Taxonomy, Sequence
+from q2_feature_classifier._taxonomic_classifier import TaxonomicClassifier
 
 import q2_clawback
 
@@ -34,35 +35,52 @@ plugin.visualizers.register_function(
 )
 
 plugin.methods.register_function(
-    function=q2_clawback.summarize_QIITA_features,
-    inputs={'reference_taxonomy': FeatureData[Taxonomy]},
-    parameters={'sample_type': List[Str],
-                'context': Str,
-                'unobserved_weight': Float},
-    outputs=[('class_weight', FeatureTable[RelativeFrequency])],
-    name='Assemble the taxonomy weights from a set of samples',
-    description='Assemble the taxonomy weights for a set of QIITA samples'
-)
-
-plugin.methods.register_function(
-    function=q2_clawback.sequence_variants_from_feature_table,
-    inputs={'table': FeatureTable[Frequency]},
+    function=q2_clawback.sequence_variants_from_samples,
+    inputs={'samples': FeatureTable[Frequency]},
     parameters=None,
     outputs=[('sequences', FeatureData[Sequence])],
     name='Extract sequence variants from a feature table',
-    description='Extract sequence variants from a feature table, '
-    'if the feature table observations are labelled by sequence variant'
+    description=('Extract sequence variants from a feature table, '
+                 'if the feature table observations are labelled by sequence '
+                 'variant')
 )
 
 plugin.methods.register_function(
     function=q2_clawback.generate_class_weights,
     inputs={'reference_taxonomy': FeatureData[Taxonomy],
             'reference_sequences': FeatureData[Sequence],
-            'table': FeatureTable[Frequency],
+            'samples': FeatureTable[Frequency],
             'taxonomy_classification': FeatureData[Taxonomy]},
     parameters={'unobserved_weight': Float, 'normalise': Bool},
     outputs=[('class_weight', FeatureTable[RelativeFrequency])],
     name='Generate class weights from a set of samples',
-    description='Generate class weights for use with a taxonomic classifier '
-    'from a set of existing observations'
+    description=('Generate class weights for use with a taxonomic classifier '
+                 'from a set of existing observations')
 )
+
+plugin.methods.register_function(
+    function=q2_clawback.fetch_QIITA_samples,
+    inputs={},
+    parameters={'sample_type': List[Str],
+                'context': Str},
+    outputs=[('samples', FeatureTable[Frequency])],
+    name='Fetch feature counts for a collection of samples',
+    description=('Fetch feature counts for a collection of samples, '
+                 'preferebly with SVs for OTU ids')
+)
+
+plugin.pipelines.register_function(
+    function=q2_clawback.assemble_weights_from_QIITA_sample_types,
+    inputs={'classifier': TaxonomicClassifier,
+            'reference_taxonomy': FeatureData[Taxonomy],
+            'reference_sequences': FeatureData[Sequence]},
+    parameters={'sample_type': List[Str],
+                'context': Str,
+                'unobserved_weight': Float,
+                'normalise': Bool},
+    outputs=[('samples', FeatureTable[RelativeFrequency])],
+    name='Assemble weights from QIITA for use with q2-feature-classifier',
+    description=('Download SV results from QIITA, classify the SVs, use the '
+              'result to collate class weights')
+)
+
