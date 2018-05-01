@@ -81,6 +81,5 @@ plugin.pipelines.register_function(
     outputs=[('samples', FeatureTable[RelativeFrequency])],
     name='Assemble weights from QIITA for use with q2-feature-classifier',
     description=('Download SV results from QIITA, classify the SVs, use the '
-              'result to collate class weights')
+                 'result to collate class weights')
 )
-
