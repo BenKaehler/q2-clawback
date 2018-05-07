@@ -27,13 +27,18 @@ def sequence_variants_from_samples(samples: biom.Table) -> DNAIterator:
     return DNAIterator(seqs)
 
 
-def summarize_QIITA_sample_types_and_contexts(output_dir: str=None):
+def _fetch_QIITA_summaries():
     md = redbiom.fetch.category_sample_values('sample_type')
     counts = md.value_counts(ascending=False)
-    sample_types = q2templates.df_to_html(
-        counts.to_frame(), bold_rows=False, header=False)
     caches = redbiom.summarize.contexts()[['ContextName', 'SamplesWithData']]
     caches = caches.sort_values(by='SamplesWithData', ascending=False)
+    return counts, caches
+
+
+def summarize_QIITA_sample_types_and_contexts(output_dir: str=None):
+    counts, caches = _fetch_QIITA_summaries()
+    sample_types = q2templates.df_to_html(
+        counts.to_frame(), bold_rows=False, header=False)
     contexts = q2templates.df_to_html(caches, index=False)
     title = 'Available in QIITA'
     index = os.path.join(TEMPLATES, 'index.html')
