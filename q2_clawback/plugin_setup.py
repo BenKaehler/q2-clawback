@@ -6,20 +6,20 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Plugin, List, Str, Float, Bool
+from qiime2.plugin import Plugin, List, Str, Float, Bool, Citations
 from q2_types.feature_table import FeatureTable, RelativeFrequency, Frequency
 from q2_types.feature_data import FeatureData, Taxonomy, Sequence
 from q2_feature_classifier._taxonomic_classifier import TaxonomicClassifier
 
 import q2_clawback
 
+citations = Citations.load('citations.bib', package='q2_clawback')
 plugin = Plugin(
     name='clawback',
     version=q2_clawback.__version__,
     website='https://github.com/BenKaehler/q2-clawback',
     package='q2_clawback',
-    citation_text=("Something Awesome. Kaehler B, Bokulich, N. "
-                   "J. Awesome. 2018"),
+    citations=[citations['bokulich2018optimizing']],
     description=('This QIIME 2 plugin provides support for generating '
                  'generating class weights for use with the '
                  'feature-classifier'),

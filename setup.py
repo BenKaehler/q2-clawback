@@ -24,6 +24,7 @@ setup(
     entry_points={
         'qiime2.plugins': ['q2-clawback=q2_clawback.plugin_setup:plugin']
     },
-    package_data={'q2_clawback.tests': ['data/*']},
+    package_data={'q2_clawback': ['citations.bib'],
+                  'q2_clawback.tests': ['data/*']},
     zip_safe=False,
 )
