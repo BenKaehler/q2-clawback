@@ -13,8 +13,7 @@ from qiime2 import Artifact
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugins.feature_classifier.methods import \
     fit_classifier_naive_bayes
-from qiime2.plugins.clawback.pipelines import \
-    assemble_weights_from_QIITA_sample_types
+from qiime2.plugins.clawback.pipelines import assemble_weights_from_QIITA
 from biom import Table
 from q2_types.feature_data import DNAIterator
 from pandas import DataFrame
@@ -43,18 +42,18 @@ class ClawbackTestPluginBase(TestPluginBase):
 
 
 class ClawbackTests(ClawbackTestPluginBase):
-    def test_assemble_weights_from_QIITA_sample_types(self):
+    def test_assemble_weights_from_QIITA(self):
         counts, caches = q2_clawback._clawback._fetch_QIITA_summaries()
 
         sample_type = 'Tears'
         self.assertTrue(hasattr(counts, sample_type))
         for context in caches.ContextName:
-            if context.startswith('Deblur-illumina-16S-v4'):
+            if context.startswith('Deblur-NA-illumina-16S-v4'):
                 break
         else:
             self.assertTrue(False)
 
-        weights = assemble_weights_from_QIITA_sample_types(
+        weights = assemble_weights_from_QIITA(
             self.classifier, self.taxonomy, self.reads, [sample_type], context)
         weights = weights[0].view(Table)
 

@@ -7,17 +7,17 @@
 # ----------------------------------------------------------------------------
 
 from ._version import get_versions
-from ._clawback import (summarize_QIITA_sample_types_and_contexts,
+from ._clawback import (summarize_QIITA_metadata_category_and_contexts,
                         fetch_QIITA_samples,
                         sequence_variants_from_samples,
                         generate_class_weights,
-                        assemble_weights_from_QIITA_sample_types)
+                        assemble_weights_from_QIITA)
 
-__all__ = ['summarize_QIITA_sample_types_and_contexts',
+__all__ = ['summarize_QIITA_metadata_category_and_contexts',
            'sequence_variants_from_samples',
            'fetch_QIITA_samples',
            'generate_class_weights',
-           'assemble_weights_from_QIITA_sample_types']
+           'assemble_weights_from_QIITA']
 
 __version__ = get_versions()['version']
 del get_versions

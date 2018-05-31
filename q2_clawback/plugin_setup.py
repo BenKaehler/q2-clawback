@@ -27,9 +27,9 @@ plugin = Plugin(
 )
 
 plugin.visualizers.register_function(
-    function=q2_clawback.summarize_QIITA_sample_types_and_contexts,
+    function=q2_clawback.summarize_QIITA_metadata_category_and_contexts,
     inputs={},
-    parameters={},
+    parameters={'category': Str},
     name='Fetch QIITA sample types and contexts',
     description='Display of counts of samples by sample type and context'
 )
@@ -61,8 +61,9 @@ plugin.methods.register_function(
 plugin.methods.register_function(
     function=q2_clawback.fetch_QIITA_samples,
     inputs={},
-    parameters={'sample_type': List[Str],
-                'context': Str},
+    parameters={'metadata_value': List[Str],
+                'context': Str,
+                'metadata_key': Str},
     outputs=[('samples', FeatureTable[Frequency])],
     name='Fetch feature counts for a collection of samples',
     description=('Fetch feature counts for a collection of samples, '
@@ -70,14 +71,15 @@ plugin.methods.register_function(
 )
 
 plugin.pipelines.register_function(
-    function=q2_clawback.assemble_weights_from_QIITA_sample_types,
+    function=q2_clawback.assemble_weights_from_QIITA,
     inputs={'classifier': TaxonomicClassifier,
             'reference_taxonomy': FeatureData[Taxonomy],
             'reference_sequences': FeatureData[Sequence]},
-    parameters={'sample_type': List[Str],
+    parameters={'metadata_value': List[Str],
                 'context': Str,
                 'unobserved_weight': Float,
-                'normalise': Bool},
+                'normalise': Bool,
+                'metadata_key': Str},
     outputs=[('samples', FeatureTable[RelativeFrequency])],
     name='Assemble weights from QIITA for use with q2-feature-classifier',
     description=('Download SV results from QIITA, classify the SVs, use the '

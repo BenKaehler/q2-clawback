@@ -27,18 +27,21 @@ def sequence_variants_from_samples(samples: biom.Table) -> DNAIterator:
     return DNAIterator(seqs)
 
 
-def _fetch_QIITA_summaries():
-    md = redbiom.fetch.category_sample_values('sample_type')
+def _fetch_QIITA_summaries(category='sample_type'):
+    md = redbiom.fetch.category_sample_values(category)
     counts = md.value_counts(ascending=False)
     caches = redbiom.summarize.contexts()[['ContextName', 'SamplesWithData']]
     caches = caches.sort_values(by='SamplesWithData', ascending=False)
     return counts, caches
 
 
-def summarize_QIITA_sample_types_and_contexts(output_dir: str=None):
-    counts, caches = _fetch_QIITA_summaries()
-    sample_types = q2templates.df_to_html(
-        counts.to_frame(), bold_rows=False, header=False)
+def summarize_QIITA_metadata_category_and_contexts(
+        output_dir: str=None, category: str='sample_type'):
+    counts, caches = _fetch_QIITA_summaries(category=category)
+    counts = counts.to_frame()
+    counts = DataFrame({category: counts.index, 'count': counts.values.T[0]},
+                       columns=[category, 'count'])
+    sample_types = q2templates.df_to_html(counts, bold_rows=False, index=False)
     contexts = q2templates.df_to_html(caches, index=False)
     title = 'Available in QIITA'
     index = os.path.join(TEMPLATES, 'index.html')
@@ -48,9 +51,10 @@ def summarize_QIITA_sample_types_and_contexts(output_dir: str=None):
         'contexts': contexts})
 
 
-def fetch_QIITA_samples(sample_type: list, context: str) -> biom.Table:
-    query = "where sample_type == '"
-    query += "' or sample_type == '".join(sample_type)
+def fetch_QIITA_samples(metadata_value: list, context: str,
+                        metadata_key: str='sample_type') -> biom.Table:
+    query = "where " + metadata_key + " == '"
+    query += ("' or " + metadata_key + " == '").join(metadata_value)
     query += "'"
     sample_ids = redbiom.search.metadata_full(query, False)
     samples, ambig = redbiom.fetch.data_from_samples(context, sample_ids)
@@ -86,11 +90,13 @@ def generate_class_weights(
     return biom.Table(weights[None].T, taxa, sample_ids=['Weight'])
 
 
-def assemble_weights_from_QIITA_sample_types(
-        ctx, classifier, reference_taxonomy, reference_sequences, sample_type,
-        context, unobserved_weight=1e-6, normalise=False):
+def assemble_weights_from_QIITA(
+        ctx, classifier, reference_taxonomy, reference_sequences,
+        metadata_value, context, unobserved_weight=1e-6, normalise=False,
+        metadata_key='sample_type'):
     samples, = ctx.get_action('clawback', 'fetch_QIITA_samples')(
-        sample_type=sample_type, context=context)
+        metadata_value=metadata_value, context=context,
+        metadata_key=metadata_key)
 
     reads, = ctx.get_action('clawback', 'sequence_variants_from_samples')(
         samples=samples)
