@@ -27,7 +27,7 @@ def sequence_variants_from_samples(samples: biom.Table) -> DNAIterator:
     return DNAIterator(seqs)
 
 
-def _fetch_QIITA_summaries(category='sample_type'):
+def _fetch_Qiita_summaries(category='sample_type'):
     md = redbiom.fetch.category_sample_values(category)
     counts = md.value_counts(ascending=False)
     caches = redbiom.summarize.contexts()[['ContextName', 'SamplesWithData']]
@@ -35,15 +35,15 @@ def _fetch_QIITA_summaries(category='sample_type'):
     return counts, caches
 
 
-def summarize_QIITA_metadata_category_and_contexts(
+def summarize_Qiita_metadata_category_and_contexts(
         output_dir: str=None, category: str='sample_type'):
-    counts, caches = _fetch_QIITA_summaries(category=category)
+    counts, caches = _fetch_Qiita_summaries(category=category)
     counts = counts.to_frame()
     counts = DataFrame({category: counts.index, 'count': counts.values.T[0]},
                        columns=[category, 'count'])
     sample_types = q2templates.df_to_html(counts, bold_rows=False, index=False)
     contexts = q2templates.df_to_html(caches, index=False)
-    title = 'Available in QIITA'
+    title = 'Available in Qiita'
     index = os.path.join(TEMPLATES, 'index.html')
     q2templates.render(index, output_dir, context={
         'title': title,
@@ -51,7 +51,7 @@ def summarize_QIITA_metadata_category_and_contexts(
         'contexts': contexts})
 
 
-def fetch_QIITA_samples(metadata_value: list, context: str,
+def fetch_Qiita_samples(metadata_value: list, context: str,
                         metadata_key: str='sample_type') -> biom.Table:
     query = "where " + metadata_key + " == '"
     query += ("' or " + metadata_key + " == '").join(metadata_value)
@@ -90,11 +90,11 @@ def generate_class_weights(
     return biom.Table(weights[None].T, taxa, sample_ids=['Weight'])
 
 
-def assemble_weights_from_QIITA(
+def assemble_weights_from_Qiita(
         ctx, classifier, reference_taxonomy, reference_sequences,
         metadata_value, context, unobserved_weight=1e-6, normalise=False,
         metadata_key='sample_type'):
-    samples, = ctx.get_action('clawback', 'fetch_QIITA_samples')(
+    samples, = ctx.get_action('clawback', 'fetch_Qiita_samples')(
         metadata_value=metadata_value, context=context,
         metadata_key=metadata_key)
 

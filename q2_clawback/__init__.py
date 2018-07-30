@@ -7,17 +7,21 @@
 # ----------------------------------------------------------------------------
 
 from ._version import get_versions
-from ._clawback import (summarize_QIITA_metadata_category_and_contexts,
-                        fetch_QIITA_samples,
+from ._clawback import (summarize_Qiita_metadata_category_and_contexts,
+                        fetch_Qiita_samples,
                         sequence_variants_from_samples,
                         generate_class_weights,
-                        assemble_weights_from_QIITA)
+                        assemble_weights_from_Qiita)
+from ._knn import precalculate_nearest_neighbors, kNN_LOOCV_F_measures
+from ._format import (PrecalculatedNearestNeighborsFormat,
+                      PrecalculatedNearestNeighborsDirectoryFormat)
+from ._type import PrecalculatedNearestNeighbors
 
-__all__ = ['summarize_QIITA_metadata_category_and_contexts',
+__all__ = ['summarize_Qiita_metadata_category_and_contexts',
            'sequence_variants_from_samples',
-           'fetch_QIITA_samples',
+           'fetch_Qiita_samples',
            'generate_class_weights',
-           'assemble_weights_from_QIITA']
+           'assemble_weights_from_Qiita']
 
 __version__ = get_versions()['version']
 del get_versions

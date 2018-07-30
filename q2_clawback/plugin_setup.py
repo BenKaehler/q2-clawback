@@ -6,7 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Plugin, List, Str, Float, Bool, Citations
+import importlib
+
+from qiime2.plugin import Plugin, List, Str, Float, Bool, Citations, Int
 from q2_types.feature_table import FeatureTable, RelativeFrequency, Frequency
 from q2_types.feature_data import FeatureData, Taxonomy, Sequence
 from q2_feature_classifier._taxonomic_classifier import TaxonomicClassifier
@@ -27,10 +29,10 @@ plugin = Plugin(
 )
 
 plugin.visualizers.register_function(
-    function=q2_clawback.summarize_QIITA_metadata_category_and_contexts,
+    function=q2_clawback.summarize_Qiita_metadata_category_and_contexts,
     inputs={},
     parameters={'category': Str},
-    name='Fetch QIITA sample types and contexts',
+    name='Fetch Qiita sample types and contexts',
     description='Display of counts of samples by sample type and context'
 )
 
@@ -59,7 +61,7 @@ plugin.methods.register_function(
 )
 
 plugin.methods.register_function(
-    function=q2_clawback.fetch_QIITA_samples,
+    function=q2_clawback.fetch_Qiita_samples,
     inputs={},
     parameters={'metadata_value': List[Str],
                 'context': Str,
@@ -71,7 +73,7 @@ plugin.methods.register_function(
 )
 
 plugin.pipelines.register_function(
-    function=q2_clawback.assemble_weights_from_QIITA,
+    function=q2_clawback.assemble_weights_from_Qiita,
     inputs={'classifier': TaxonomicClassifier,
             'reference_taxonomy': FeatureData[Taxonomy],
             'reference_sequences': FeatureData[Sequence]},
@@ -80,8 +82,44 @@ plugin.pipelines.register_function(
                 'unobserved_weight': Float,
                 'normalise': Bool,
                 'metadata_key': Str},
-    outputs=[('samples', FeatureTable[RelativeFrequency])],
-    name='Assemble weights from QIITA for use with q2-feature-classifier',
-    description=('Download SV results from QIITA, classify the SVs, use the '
+    outputs=[('class_weight', FeatureTable[RelativeFrequency])],
+    name='Assemble weights from Qiita for use with q2-feature-classifier',
+    description=('Download SV results from Qiita, classify the SVs, use the '
                  'result to collate class weights')
 )
+
+plugin.methods.register_function(
+    function=q2_clawback.precalculate_nearest_neighbors,
+    inputs={'reference_taxonomy': FeatureData[Taxonomy],
+            'reference_sequences': FeatureData[Sequence]},
+    parameters={'max_centroids_per_class': Int,
+                'feature_extractor_specification': Str,
+                'knn_classifier_specification': Str,
+                'n_jobs': Int,
+                'random_state': Int},
+    outputs=[('nearest_neighbors', q2_clawback.PrecalculatedNearestNeighbors)],
+    name='Calculate nearest neighbors for estimating class weight importance',
+    description=('Fit a kNN classifier to the optionally undersampled '
+                 'reference data and cache the neighbors')
+)
+
+plugin.visualizers.register_function(
+    function=q2_clawback.kNN_LOOCV_F_measures,
+    inputs={'nearest_neighbors': q2_clawback.PrecalculatedNearestNeighbors,
+            'class_weight': FeatureTable[RelativeFrequency]},
+    parameters={},
+    name='Estimate importance of class weights',
+    description=('Calculated k Nearest Neighbors Leave-One-Out Cross '
+                 'Validated F-measures for weighted and uniform assumptions')
+)
+
+plugin.register_semantic_types(q2_clawback.PrecalculatedNearestNeighbors)
+plugin.register_formats(
+    q2_clawback.PrecalculatedNearestNeighborsFormat,
+    q2_clawback.PrecalculatedNearestNeighborsDirectoryFormat
+)
+plugin.register_semantic_type_to_format(
+    q2_clawback.PrecalculatedNearestNeighbors,
+    artifact_format=q2_clawback.PrecalculatedNearestNeighborsDirectoryFormat
+)
+importlib.import_module('q2_clawback._transformer')
