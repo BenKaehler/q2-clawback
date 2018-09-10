@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2017, Ben Kaehler.
+# Copyright (c) 2017-2018, Ben Kaehler.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -21,7 +21,12 @@ __all__ = ['summarize_Qiita_metadata_category_and_contexts',
            'sequence_variants_from_samples',
            'fetch_Qiita_samples',
            'generate_class_weights',
-           'assemble_weights_from_Qiita']
+           'assemble_weights_from_Qiita',
+           'precalculate_nearest_neighbors',
+           'kNN_LOOCV_F_measures',
+           'PrecalculatedNearestNeighborsFormat',
+           'PrecalculatedNearestNeighborsDirectoryFormat',
+           'PrecalculatedNearestNeighbors']
 
 __version__ = get_versions()['version']
 del get_versions
