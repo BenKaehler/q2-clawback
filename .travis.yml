@@ -19,7 +19,7 @@ install:
   - pip install -q https://github.com/qiime2/q2lint/archive/master.zip
   - export LINT_SOURCE=`python -c "from q2lint._main import main; from inspect import getsourcefile; print(getsourcefile(main))"`
   - export REF_LICENSE=`dirname $LINT_SOURCE`/REF_LICENSE
-  - sed -i '' 's/QIIME 2 development team/Ben Kaehler/' $LINT_SOURCE $REF_LICENSE
+  - sed -i 's/QIIME 2 development team/Ben Kaehler/' $LINT_SOURCE $REF_LICENSE
   - conda install -q -c glemaitre imbalanced-learn
   - pip install flake8 coveralls redbiom
   - make install
