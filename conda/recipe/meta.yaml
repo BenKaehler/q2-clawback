@@ -13,13 +13,12 @@ build:
   noarch: generic
 
 requirements:
-  build:
-    - python 3.5*
+  host:
+    - python {{ python }}
     - setuptools
 
   run:
-    - python
-    - setuptools
+    - python {{ python }}
     - q2templates >=2018.8.0
     - q2-feature-classifier >=2018.8.0
     - imbalanced-learn
