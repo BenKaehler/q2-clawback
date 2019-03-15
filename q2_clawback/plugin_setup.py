@@ -1,14 +1,12 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2017-2018, Ben Kaehler.
+# Copyright (c) 2017-2019, Ben Kaehler.
 #
 # Distributed under the terms of the Modified BSD License.
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from qiime2.plugin import Plugin, List, Str, Float, Bool, Citations, Int
+from qiime2.plugin import Plugin, List, Str, Float, Bool, Citations
 from q2_types.feature_table import FeatureTable, RelativeFrequency, Frequency
 from q2_types.feature_data import FeatureData, Taxonomy, Sequence
 from q2_feature_classifier._taxonomic_classifier import TaxonomicClassifier
@@ -21,7 +19,8 @@ plugin = Plugin(
     version=q2_clawback.__version__,
     website='https://github.com/BenKaehler/q2-clawback',
     package='q2_clawback',
-    citations=[citations['bokulich2018optimizing']],
+    citations=[citations['bokulich2018optimizing'],
+               citations['kaehler2019species']],
     description=('This QIIME 2 plugin provides support for generating '
                  'generating class weights for use with the '
                  'feature-classifier'),
@@ -87,39 +86,3 @@ plugin.pipelines.register_function(
     description=('Download SV results from Qiita, classify the SVs, use the '
                  'result to collate class weights')
 )
-
-plugin.methods.register_function(
-    function=q2_clawback.precalculate_nearest_neighbors,
-    inputs={'reference_taxonomy': FeatureData[Taxonomy],
-            'reference_sequences': FeatureData[Sequence]},
-    parameters={'max_centroids_per_class': Int,
-                'feature_extractor_specification': Str,
-                'knn_classifier_specification': Str,
-                'n_jobs': Int,
-                'random_state': Int},
-    outputs=[('nearest_neighbors', q2_clawback.PrecalculatedNearestNeighbors)],
-    name='Calculate nearest neighbors for estimating class weight importance',
-    description=('Fit a kNN classifier to the optionally undersampled '
-                 'reference data and cache the neighbors')
-)
-
-plugin.visualizers.register_function(
-    function=q2_clawback.kNN_LOOCV_F_measures,
-    inputs={'nearest_neighbors': q2_clawback.PrecalculatedNearestNeighbors,
-            'class_weight': FeatureTable[RelativeFrequency]},
-    parameters={},
-    name='Estimate importance of class weights',
-    description=('Calculated k Nearest Neighbors Leave-One-Out Cross '
-                 'Validated F-measures for weighted and uniform assumptions')
-)
-
-plugin.register_semantic_types(q2_clawback.PrecalculatedNearestNeighbors)
-plugin.register_formats(
-    q2_clawback.PrecalculatedNearestNeighborsFormat,
-    q2_clawback.PrecalculatedNearestNeighborsDirectoryFormat
-)
-plugin.register_semantic_type_to_format(
-    q2_clawback.PrecalculatedNearestNeighbors,
-    artifact_format=q2_clawback.PrecalculatedNearestNeighborsDirectoryFormat
-)
-importlib.import_module('q2_clawback._transformer')

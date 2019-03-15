@@ -4,7 +4,7 @@ all: ;
 
 lint:
 	q2lint
-	flake8
+	flake8 --ignore=W605
 
 test: all
 	py.test

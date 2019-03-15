@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2017-2018, Ben Kaehler.
+# Copyright (c) 2017-2019, Ben Kaehler.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -48,7 +48,7 @@ class ClawbackTests(ClawbackTestPluginBase):
         sample_type = 'Tears'
         self.assertTrue(hasattr(counts, sample_type))
         for context in caches.ContextName:
-            if context.startswith('Deblur-NA-illumina-16S-v4'):
+            if context.startswith('Deblur-Illumina-16S-V4'):
                 break
         else:
             self.assertTrue(False)

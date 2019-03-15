@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2017-2018, Ben Kaehler.
+# Copyright (c) 2017-2019, Ben Kaehler.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -36,7 +36,7 @@ def _fetch_Qiita_summaries(category='sample_type'):
 
 
 def summarize_Qiita_metadata_category_and_contexts(
-        output_dir: str=None, category: str='sample_type'):
+        output_dir: str = None, category: str = 'sample_type'):
     counts, caches = _fetch_Qiita_summaries(category=category)
     counts = counts.to_frame()
     counts = DataFrame({category: counts.index, 'count': counts.values.T[0]},
@@ -52,7 +52,7 @@ def summarize_Qiita_metadata_category_and_contexts(
 
 
 def fetch_Qiita_samples(metadata_value: list, context: str,
-                        metadata_key: str='sample_type') -> biom.Table:
+                        metadata_key: str = 'sample_type') -> biom.Table:
     query = "where " + metadata_key + " == '"
     query += ("' or " + metadata_key + " == '").join(metadata_value)
     query += "'"
@@ -64,7 +64,8 @@ def fetch_Qiita_samples(metadata_value: list, context: str,
 def generate_class_weights(
         reference_taxonomy: Series, reference_sequences: DNAIterator,
         samples: biom.Table, taxonomy_classification: DataFrame,
-        unobserved_weight: float=1e-6, normalise: bool=False) -> biom.Table:
+        unobserved_weight: float = 1e-6, normalise: bool = False) \
+        -> biom.Table:
     weights = {reference_taxonomy[seq.metadata['id']]: 0.
                for seq in reference_sequences}
     if normalise:
@@ -84,7 +85,8 @@ def generate_class_weights(
     taxa, weights = zip(*weights.items())
     weights = array(weights)
     weights /= weights.sum()
-    weights = (1. - unobserved_weight)*weights + unobserved_weight/len(weights)
+    weights = \
+        (1. - unobserved_weight) * weights + unobserved_weight / len(weights)
     weights /= weights.sum()
 
     return biom.Table(weights[None].T, taxa, sample_ids=['Weight'])
