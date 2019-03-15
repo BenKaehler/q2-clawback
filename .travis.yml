@@ -1,7 +1,6 @@
+dist: trusty
 sudo: false
 language: python
-python:
-  - "3.5"
 before_install:
   - export MPLBACKEND='Agg'
   - wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -12,15 +11,14 @@ before_install:
   - conda update -q conda
   - conda info -a
 install:
-  - wget -q https://raw.githubusercontent.com/qiime2/environment-files/master/latest/staging/qiime2-latest-py35-linux-conda.yml
-  - conda env create -q -n test-env --file qiime2-latest-py35-linux-conda.yml
+  - wget -q https://raw.githubusercontent.com/qiime2/environment-files/master/latest/staging/qiime2-latest-py36-linux-conda.yml
+  - conda env create -q -n test-env --file qiime2-latest-py36-linux-conda.yml
   - source activate test-env
   - conda install -q pytest-cov
   - pip install -q https://github.com/qiime2/q2lint/archive/master.zip
   - export LINT_SOURCE=`python -c "from q2lint._main import main; from inspect import getsourcefile; print(getsourcefile(main))"`
   - export REF_LICENSE=`dirname $LINT_SOURCE`/REF_LICENSE
   - sed -i 's/QIIME 2 development team/Ben Kaehler/' $LINT_SOURCE $REF_LICENSE
-  - conda install -q -c glemaitre imbalanced-learn
   - pip install flake8 coveralls redbiom
   - make install
 script:
