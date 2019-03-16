@@ -19,7 +19,8 @@ install:
   - export LINT_SOURCE=`python -c "from q2lint._main import main; from inspect import getsourcefile; print(getsourcefile(main))"`
   - export REF_LICENSE=`dirname $LINT_SOURCE`/REF_LICENSE
   - sed -i 's/QIIME 2 development team/Ben Kaehler/' $LINT_SOURCE $REF_LICENSE
-  - pip install flake8 coveralls redbiom
+  - pip install flake8 coveralls
+  - conda install -c kaehler redbiom
   - make install
 script:
   - make lint
