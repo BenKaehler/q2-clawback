@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}q2-clawback : {{ title }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+	<div class="row">
+	  <h1>Metadata Values</h1>
+	  <div class="col-lg-12">
+	    {{ sample_types }}
+	  </div>
+	  <h1>Contexts</h1>
+	  <div class="col-lg-12">
+	    {{ contexts }}
+	  </div>
+	</div>
+
+{% endblock %}
