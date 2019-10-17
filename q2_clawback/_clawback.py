@@ -64,7 +64,8 @@ def fetch_Qiita_samples(metadata_value: list, context: str,
 def generate_class_weights(
         reference_taxonomy: Series, reference_sequences: DNAIterator,
         samples: biom.Table, taxonomy_classification: DataFrame,
-        unobserved_weight: float = 1e-6, normalise: bool = False) \
+        unobserved_weight: float = 1e-6, normalise: bool = False,
+        allow_weight_outside_reference: bool = False) \
         -> biom.Table:
     weights = {reference_taxonomy[seq.metadata['id']]: 0.
                for seq in reference_sequences}
@@ -76,12 +77,13 @@ def generate_class_weights(
         taxa = [tax_map[s] for s in samples.ids(axis='observation')]
     except KeyError as s:
         raise ValueError(str(s) + ' not in taxonomy_classification')
-    if not set(taxa).issubset(weights):
+    if not allow_weight_outside_reference and not set(taxa).issubset(weights):
         raise ValueError(
             'taxonomy_classification does not match reference_taxonomy')
 
     for taxon, count in zip(taxa, samples.sum('observation')):
-        weights[taxon] += count
+        if taxon in weights:
+            weights[taxon] += count
     taxa, weights = zip(*weights.items())
     weights = array(weights)
     weights /= weights.sum()
@@ -95,7 +97,7 @@ def generate_class_weights(
 def assemble_weights_from_Qiita(
         ctx, classifier, reference_taxonomy, reference_sequences,
         metadata_value, context, unobserved_weight=1e-6, normalise=False,
-        metadata_key='sample_type'):
+        metadata_key='sample_type', n_jobs=1, reads_per_batch=0):
     samples, = ctx.get_action('clawback', 'fetch_Qiita_samples')(
         metadata_value=metadata_value, context=context,
         metadata_key=metadata_key)
@@ -104,7 +106,8 @@ def assemble_weights_from_Qiita(
         samples=samples)
 
     classification, = ctx.get_action('feature-classifier', 'classify_sklearn')(
-        reads=reads, classifier=classifier, confidence=-1)
+        reads=reads, classifier=classifier, confidence=-1, n_jobs=n_jobs,
+        reads_per_batch=reads_per_batch)
 
     return tuple(ctx.get_action('clawback', 'generate_class_weights')(
         reference_taxonomy=reference_taxonomy,
