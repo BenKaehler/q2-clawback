@@ -106,8 +106,8 @@ def assemble_weights_from_Qiita(
         samples=samples)
 
     classification, = ctx.get_action('feature-classifier', 'classify_sklearn')(
-        reads=reads, classifier=classifier, confidence=-1, n_jobs=n_jobs,
-        reads_per_batch=reads_per_batch)
+        reads=reads, classifier=classifier, confidence='disable',
+        n_jobs=n_jobs, reads_per_batch=reads_per_batch)
 
     return tuple(ctx.get_action('clawback', 'generate_class_weights')(
         reference_taxonomy=reference_taxonomy,
