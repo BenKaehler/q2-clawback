@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2017-2019, Ben Kaehler.
+# Copyright (c) 2017-2022, Ben Kaehler.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -20,7 +20,7 @@ plugin = Plugin(
     website='https://github.com/BenKaehler/q2-clawback',
     package='q2_clawback',
     citations=[citations['bokulich2018optimizing'],
-               citations['kaehler2019species']],
+               citations['kaehler2022species']],
     description=('This QIIME 2 plugin provides support for generating '
                  'generating class weights for use with the '
                  'feature-classifier'),

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2017-2019, Ben Kaehler.
+# Copyright (c) 2017-2022, Ben Kaehler.
 #
 # Distributed under the terms of the Modified BSD License.
 #
