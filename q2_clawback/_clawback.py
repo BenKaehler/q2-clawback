@@ -97,7 +97,7 @@ def generate_class_weights(
 def assemble_weights_from_Qiita(
         ctx, classifier, reference_taxonomy, reference_sequences,
         metadata_value, context, unobserved_weight=1e-6, normalise=False,
-        metadata_key='sample_type', n_jobs=1, reads_per_batch=0,
+        metadata_key='sample_type', n_jobs=1, reads_per_batch='auto',
         allow_weight_outside_reference=False):
     samples, = ctx.get_action('clawback', 'fetch_Qiita_samples')(
         metadata_value=metadata_value, context=context,

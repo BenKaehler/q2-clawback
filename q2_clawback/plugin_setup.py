@@ -6,7 +6,8 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import Plugin, List, Str, Float, Bool, Int, Citations
+from qiime2.plugin import (Plugin, List, Str, Float, Bool, Int, Citations,
+                           Range, Choices)
 from q2_types.feature_table import FeatureTable, RelativeFrequency, Frequency
 from q2_types.feature_data import FeatureData, Taxonomy, Sequence
 from q2_feature_classifier._taxonomic_classifier import TaxonomicClassifier
@@ -138,14 +139,15 @@ plugin.pipelines.register_function(
     inputs={'classifier': TaxonomicClassifier,
             'reference_taxonomy': FeatureData[Taxonomy],
             'reference_sequences': FeatureData[Sequence]},
-    parameters={'metadata_value': List[Str],
-                'context': Str,
-                'unobserved_weight': Float,
-                'normalise': Bool,
-                'metadata_key': Str,
-                'n_jobs': Int,
-                'reads_per_batch': Int,
-                'allow_weight_outside_reference': Bool},
+    parameters={
+        'metadata_value': List[Str],
+        'context': Str,
+        'unobserved_weight': Float,
+        'normalise': Bool,
+        'metadata_key': Str,
+        'n_jobs': Int,
+        'reads_per_batch': Int % Range(1, None) | Str % Choices(['auto']),
+        'allow_weight_outside_reference': Bool},
     outputs=[('class_weight', FeatureTable[RelativeFrequency])],
     name='Assemble weights from Qiita for use with q2-feature-classifier',
     description=('Download SV results from Qiita, classify the SVs, use the '
