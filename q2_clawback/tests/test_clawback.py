@@ -63,7 +63,7 @@ class ClawbackTests(ClawbackTestPluginBase):
         sample_type = 'Tears'
         self.assertTrue(hasattr(counts, sample_type))
         for context in caches.ContextName:
-            if context.startswith('Deblur-Illumina-16S-V4'):
+            if context.startswith('Deblur') and 'Illumina-16S-V4' in context:
                 break
         else:
             self.assertTrue(False)
