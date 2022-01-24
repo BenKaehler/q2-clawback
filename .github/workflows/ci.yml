@@ -27,9 +27,7 @@ jobs:
         python-version: 3.8
 
     - name: install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install redbiom
+      run: python -m pip install --upgrade pip
 
     - name: lint
       run: |
@@ -55,6 +53,9 @@ jobs:
 
     - name: set up git repo for versioneer
       run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+    - name: install redbiom
+      run: pip install redbiom
 
     - uses: qiime2/action-library-packaging@alpha1
       with:
