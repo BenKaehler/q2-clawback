@@ -51,6 +51,11 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: set up python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
     - name: set up git repo for versioneer
       run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
