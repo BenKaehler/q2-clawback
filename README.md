@@ -1,6 +1,6 @@
 # q2-clawback
 
-[![Build Status](https://travis-ci.org/BenKaehler/q2-clawback.svg?branch=master)](https://travis-ci.org/BenKaehler/q2-clawback)
+![](https://github.com/BenKaehler/q2-clawback/workflows/ci/badge.svg)
 
 This is a QIIME 2 plugin. For details on QIIME 2, see https://qiime2.org.
 
