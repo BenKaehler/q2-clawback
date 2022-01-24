@@ -20,7 +20,7 @@ plugin = Plugin(
     website='https://github.com/BenKaehler/q2-clawback',
     package='q2_clawback',
     citations=[citations['bokulich2018optimizing'],
-               citations['kaehler2022species']],
+               citations['kaehler2019species']],
     description=('This QIIME 2 plugin provides support for generating '
                  'generating class weights for use with the '
                  'feature-classifier'),
