@@ -1,0 +1,62 @@
+# ci workflow
+
+name: ci
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# mostly stolen from https://github.com/qiime2/q2-feature-classifier/blob/master/.github/workflows/ci.yml
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout source
+      uses: actions/checkout@v2
+
+    - name: set up python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: install dependencies
+      run: python -m pip install --upgrade pip
+
+    - name: lint
+      run: |
+        pip install -q https://github.com/qiime2/q2lint/archive/master.zip
+        export LINT_SOURCE=`python -c "from q2lint._main import main; from inspect import getsourcefile; print(getsourcefile(main))"`
+        export REF_LICENSE=`dirname $LINT_SOURCE`/REF_LICENSE
+        sed -i 's/QIIME 2 development team/Ben Kaehler/' $LINT_SOURCE $REF_LICENSE
+        q2lint
+        pip install -q flake8
+        flake8
+
+  build-and-test:
+    needs: lint
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: checkout source
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: set up git repo for versioneer
+      run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+    - uses: qiime2/action-library-packaging@alpha1
+      with:
+        package-name: q2-clawback
+        build-target: release
+        additional-tests: py.test --pyargs q2_clawback
+        library-token: ${{ secrets.LIBRARY_TOKEN }}
