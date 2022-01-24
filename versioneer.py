@@ -561,7 +561,7 @@ def git_get_keywords(versionfile_abs):
         f = open(versionfile_abs, "r")
         for line in f.readlines():
             if line.strip().startswith("git_refnames ="):
-                mo = re.search(r'=\s*"(.*)"', line)
+                mo = re.search(r'=\s*"(.*)"', line)  # noqa: W605
                 if mo:
                     keywords["refnames"] = mo.group(1)
             if line.strip().startswith("git_full ="):
