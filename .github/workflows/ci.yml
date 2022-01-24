@@ -54,8 +54,11 @@ jobs:
     - name: set up git repo for versioneer
       run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
+    # necessary until redbiom is updated to 0.3.8 on conda
     - name: install redbiom
-      run: pip install redbiom
+      run: |
+        pip install numpy
+        pip install redbiom
 
     - uses: qiime2/action-library-packaging@alpha1
       with:
